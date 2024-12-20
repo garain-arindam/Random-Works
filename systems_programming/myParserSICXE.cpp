@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <bitset>
 #include <algorithm>
 using namespace std;
 // decimal to binary
@@ -19,20 +20,12 @@ string decToBinary(int dec)
     }
 
 // finding the instruction format 
-int getInstFormat(unsigned int inst){
-    
-    if ( inst <= 0xff) {
-        return 1;
-    }
-    else if ( inst <= 0xffff) {
-        return 2;
-    }
-    else if (inst <= 0xffffff){
-        return 3;
-    }
-    else if (inst <= 0xffffffff){
-        return 4;
-    }
+int getInstFormat(string inst){
+    int format =  inst.size();
+    if (format >=1) && (format <= 4)
+        return format;
+    else    
+        return -1;
 }
 
 // validity of the instruction
@@ -46,6 +39,7 @@ bool isValidInst(unsigned int inst){
         return ( (inst & 0x0300)  == 0 );
         break;
     case 3 :
+        cout << "inside isvalid: frmt 3 -> inst & 0x030000 "<< (inst & 0x030000) << endl;////////
         return ( (inst & 0x030000)  == 0 );
 
         break;    
@@ -54,6 +48,7 @@ bool isValidInst(unsigned int inst){
 
         break;
     default:
+        return false;
         break;
     }
 }
@@ -61,25 +56,13 @@ bool isValidInst(unsigned int inst){
 // getting OPCODE
 string getOpCode(unsigned int inst){
     string opCode;
-    int opcodeval;
-   
-    unsigned int opcodeval;
 
     return opCode;
 }
 
-
-
-
-
-
-string getAddressModes(string inst){
-    string addrModes; 
-    return addrModes;
-}
-
+// getting nixbpe
 string getnixbpe( unsigned int inst){
-    unsigned int instfrmt = 0xffff;
+    unsigned int instfrmt = 0xffff; // format 2
     unsigned int limit = 0XFFFFFF;
     unsigned int nixbpe = inst & 0x03F000;
     
@@ -92,30 +75,71 @@ string getnixbpe( unsigned int inst){
         nixbpe = nixbpe >> 12 ;
     }
     else {
-        nixbpe = inst & 0x3F00000;
+        nixbpe = inst & 0x03F00000;
         nixbpe = nixbpe >> 20;
     }
 
     return decToBinary(nixbpe);
 }
 
+
+// addressing modes
+string getAddressModes(unsigned int inst){
+    cout << "inside adr mode : " << isValidInst(inst) << endl;//////////////////////
+    if (isValidInst(inst) && (getInstFormat(inst) >= 3) ){
+        string nixbpe = getnixbpe(inst);
+        cout << "inside adr mode " << nixbpe << endl;///////////////////////
+        //if (nixbpe[0] == '0' && nixbpe[1] == '0' && nixbpe[2] == '0' ) || (nixbpe[0] == '0' && nixbpe[1] == '0' && nixbpe[2] == '1' )
+        if (nixbpe.substr(0,2) == "000" || nixbpe.substr(0,2) == "001"){
+            return "Simple";
+        }
+        if (nixbpe[0] == '0'&& nixbpe[1] == '1')
+            return "Immediate";
+        else if (nixbpe[0] == '1' && nixbpe[1] == '0')
+            return "Indirect";
+        else if (nixbpe[0] == '1' && nixbpe[1] == '1')
+            return "Simple";
+    }
+    return "Invalid Instruction";
+}
+
+
+
 unsigned int getTargetAddress(unsigned int inst){
     unsigned int ta;
-    
-    return ta;
+    if (isValidInst(inst)){
+        if ( getInstFormat(inst) == 3){
+            return (inst & 0x000fff);
+        if (getInstFormat(inst) == 4)
+            return (inst & 0x000fffff);
+        }
+    }
+    return 0;
 }
 
 
 
 int main() {
     // Write C++ code here
-    unsigned int inst;
+    string inst;
    
     unsigned int nixbpe; 
 
-    cout << "Enter Hex: ";
-    cin >> hex >> inst; 
-    cout << "nixbpe: " << getnixbpe(inst) << endl;
+    cout << "Enter instruction in hex: ";
+    cin >> inst; 
+    //inst = 0x241024;
+    
+    // bitset<24> hex(0x241024);
+    // bitset<24> ext(0x03F000);
+    // string nixbpes=(hex & ext).to_string();
+    // cout << "hex " << hex << endl <<  "ext " << ext << endl;
+    // cout << "nixbpe: " << nixbpes << "only part: " << nixbpes.substr(6,6) << endl ;
+    // cout << "inst in bin " <<  decToBinary(inst) << inst << ": " << decToBinary(0x030000) << endl;
+    // cout << "nixbpe: " << getnixbpe(inst) << endl;
+    // cout << "adr mode: " << getAddressModes(inst) << endl;
+    // cout << "target address: " << decToBinary(getTargetAddress(inst)) << endl;
+    // cout << "format:  " << getInstFormat(inst) << endl;
+
     
     return 0;
 }
