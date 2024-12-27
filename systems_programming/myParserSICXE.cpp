@@ -21,44 +21,71 @@ string decToBinary(int dec)
 
 // finding the instruction format 
 int getInstFormat(string inst){
-    int format =  inst.size();
-    if (format >=1) && (format <= 4)
-        return format;
+    if (inst.size() % 2  == 0)
+        if ((inst.size()/2 >=1) && (inst.size()/2 <= 4))
+            return inst.size()/2;
+        else return 0;
     else    
-        return -1;
+        return 0;
 }
 
-// validity of the instruction
-bool isValidInst(unsigned int inst){
-     switch (getInstFormat(inst))
+// getting OPCODE
+string getOpCode(string inst){
+    string code;
+    unsigned long instruction = stoul(inst, nullptr, 16);
+    switch (getInstFormat(inst))
     {
-    case 1 :
+    case 1:
+        bitset<8> opCode(instruction);
+        code = opcode.to_string();
+        break;
+    case 2:
+        bitset<16> opCode(instruction);
+        code = opcode.to_string();
+        break;
+    case 3:
+    
+        break;
+    case 4:
+    
+        break;    
+    default:
+        break;
+    }
+    return opCode;
+}
+
+/**
+// validity of the instruction
+bool isValidInst(string inst){
+    int size = 8 * getInstFormat(inst);
+    unsigned long int instruction = stoul(inst, nullptr,16); 
+    switch (size)
+    {
+    case 8 :
+        bitset<8> 
         return ( (inst & 0x03) == 0 );
         break;
-    case 2 :
+    case 16 :
         return ( (inst & 0x0300)  == 0 );
         break;
-    case 3 :
+    case 24 :
         cout << "inside isvalid: frmt 3 -> inst & 0x030000 "<< (inst & 0x030000) << endl;////////
         return ( (inst & 0x030000)  == 0 );
 
         break;    
-    case 4 :
+    case 32 :
         return ( (inst & 0x03000000)  == 0 );
 
         break;
     default:
-        return false;
+        //return false;
         break;
     }
+    return false;
 }
 
-// getting OPCODE
-string getOpCode(unsigned int inst){
-    string opCode;
 
-    return opCode;
-}
 
 // getting nixbpe
 string getnixbpe( unsigned int inst){
@@ -117,7 +144,7 @@ unsigned int getTargetAddress(unsigned int inst){
     return 0;
 }
 
-
+*/
 
 int main() {
     // Write C++ code here
@@ -127,6 +154,7 @@ int main() {
 
     cout << "Enter instruction in hex: ";
     cin >> inst; 
+    cout << "Format "<< getInstFormat(inst) << endl;
     //inst = 0x241024;
     
     // bitset<24> hex(0x241024);
