@@ -31,28 +31,28 @@ int getInstFormat(string inst){
 
 // getting OPCODE
 string getOpCode(string inst){
-    string code;
+    string code = string();
     unsigned long instruction = stoul(inst, nullptr, 16);
-    switch (getInstFormat(inst))
-    {
-    case 1:
-        bitset<8> opCode(instruction);
-        code = opcode.to_string();
-        break;
-    case 2:
-        bitset<16> opCode(instruction);
-        code = opcode.to_string();
-        break;
-    case 3:
-    
-        break;
-    case 4:
-    
-        break;    
-    default:
-        break;
+    if (getInstFormat(inst) == 1) {
+        std::bitset<8> opCode1(instruction);
+        code = opCode1.to_string();
+    } 
+    else if (getInstFormat(inst) == 2) {
+        std::bitset<16> opCode2(instruction);
+        std::bitset<16> opBits2(0xfc00); // for getting the 8 bits opcode
+        code = ((opCode2 & opBits2).to_string()).substr(0, 8);
+    } 
+    else if (getInstFormat(inst) == 3) {
+        std::bitset<24> opCode3(instruction);
+        std::bitset<24> opBits3(0xfc0000); // for getting the 8 bits opcode
+        code = ((opCode3 & opBits3).to_string()).substr(0, 8);
+    } 
+    else if (getInstFormat(inst) == 4) {
+        std::bitset<32> opCode4(instruction);
+        std::bitset<32> opBits4(0xfc000000); // for getting the 8 bits opcode
+        code = ((opCode4 & opBits4).to_string()).substr(0, 8);
     }
-    return opCode;
+    return code; // returns empty string
 }
 
 /**
@@ -154,7 +154,8 @@ int main() {
 
     cout << "Enter instruction in hex: ";
     cin >> inst; 
-    cout << "Format "<< getInstFormat(inst) << endl;
+    cout << "Format " << getInstFormat(inst) << endl;
+    cout << "Opcode " << getOpCode(inst) << endl;
     //inst = 0x241024;
     
     // bitset<24> hex(0x241024);
